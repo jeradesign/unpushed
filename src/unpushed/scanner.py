@@ -2,7 +2,7 @@ import os
 import re
 from subprocess import Popen, PIPE
 
-from . import repos
+import repos
 
 class ErrorCannotLocate(Exception):
     """Signal that we cannot successfully run the locate(1) binary."""

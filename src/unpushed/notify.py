@@ -4,7 +4,7 @@ import os
 import sys
 from optparse import OptionParser
 
-from . import scanner
+import scanner
 
 USAGE = '''usage: %prog [options] path [path...]
 
