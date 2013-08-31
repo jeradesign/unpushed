@@ -59,8 +59,9 @@ def mercurial(path, ignore_set, **options):
 def git(path, ignore_set, **options):
     """Get statuses of a Git repository."""
     ignore_untracked = options['ignore_untracked']
+    ignore_no_remote = options['ignore_no_remote']
 
-    process = Popen(('git', 'status', '--porcelain'), stdout=PIPE, cwd=path)
+    process = Popen(('git', 'status', '--porcelain'), stdout=PIPE, cwd=path) #
     output = process.stdout.read()
     lines = output.splitlines()
     untracked_count = ilen((line for line in lines if line.startswith('?')))
@@ -88,6 +89,19 @@ def git(path, ignore_set, **options):
     # git log --branches --not --remotes --simplify-by-decoration --decorate --oneline
     # git branch -v
     # git for-each-ref --format='%(refname)' refs/heads
+    process = Popen(('git', 'remote'), stdout=PIPE, cwd=path)
+    remotes = [rem for rem in process.stdout.read().splitlines()]
+    has_remotes = bool(remotes)
+    if not has_remotes:
+        if not ignore_no_remote:
+            yield dict(
+                touched=touched,
+                path='%s' % path,
+                status='no remote' if not has_remotes else 'OK',
+                output=remotes,
+            )
+        return
+    
     process = Popen(('git', 'branch'), stdout=PIPE, cwd=path)
     branches = [br[2:] for br in process.stdout.read().splitlines()]
     for branch in branches:

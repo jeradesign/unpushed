@@ -24,8 +24,10 @@ def main():
                       help='manually walk file tree to find repositories')
     parser.add_option('-t', '--tracked', dest='ignore_untracked', action='store_true',
                       help='ignore untracked files in repositories')
+    parser.add_option('-r', '--remote', dest='ignore_no_remote', action='store_true',
+                      help='ignore repositories with no remote')
     (options, args) = parser.parse_args()
-
+    
     if not args:
         parser.print_help()
         exit(2)
@@ -49,7 +51,7 @@ def main():
         repos.update(find_repos(path))
 
     repos = sorted(repos)
-    for status in scanner.scan_repos(repos, ignore_untracked=options.ignore_untracked):
+    for status in scanner.scan_repos(repos, ignore_untracked=options.ignore_untracked, ignore_no_remote=options.ignore_no_remote):
         if status['touched'] or options.print_all:
             status_char = '*' if status['touched'] else ' '
             print status_char, status['path'], status['status'], '('+status['vcs']+')'
